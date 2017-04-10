@@ -49,7 +49,10 @@
 
 *   白名单HOST-为了限制Fuzz的范围, 默认为空-表示对除黑名单范围外的所有地址进行Fuzz.
 
-`white_site =qunar`
+`white_site =`
+
+*   参数名黑名单-如: submit
+  `black_parameters =submit`
 
 *   请求超时-限制每次Fuzz请求超时时间
 
