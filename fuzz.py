@@ -24,6 +24,7 @@ class CIF_Fuzz(threading.Thread):
         self.white_site = ['']
         self.url_ext_blacklist = ['']
         self.black_site = ['.gov']
+        self.black_parameters = ['']
         self.Logfile = ''
         self.my_cloudeye = ""
         self.CheckKey_list = ['']
@@ -88,6 +89,10 @@ class CIF_Fuzz(threading.Thread):
         TAG = ''.join(random.choice(string.ascii_uppercase) for i in range(6))
 
         for match in re.finditer(r"((\A|[?&])(?P<parameter>[^_]\w*)=)(?P<value>[^&#]+)", base_url):
+            in_black_param = self.check_in_keys(match.group("parameter"), self.black_parameters)
+            if in_black_param:
+                continue
+
             print "[GET] Fuzzing "+match.group("parameter")
             for payload_item in fuzzing_payloads:
                 if self.my_cloudeye in payload_item:
@@ -119,6 +124,10 @@ class CIF_Fuzz(threading.Thread):
 
         post_body = request['body']
         for match in re.finditer(r"((\A|[?&])(?P<parameter>[^_]\w*)=)(?P<value>[^&#]+)", post_body):
+            in_black_param = self.check_in_keys(match.group("parameter"), self.black_parameters)
+            if in_black_param:
+                continue
+
             try:
                 print "[POST] Fuzzing "+match.group("parameter")
                 for payload_item in fuzzing_payloads:
@@ -165,20 +174,16 @@ class CIF_Fuzz(threading.Thread):
         wfile.flush()
         wfile.close()
 
-    def check_white_site(self, uri):
-        if len(self.white_site) ==0:
-            return True
+    def check_in_keys(self, uri, keys_list):
+        uri = uri.lower()
+
+        if len(keys_list) == 0:
+            return False
         else:
-            for u in self.white_site:
-                if u in uri:
+            for k in keys_list:
+                if k.lower() in uri:
                     return True
             return False
-
-    def check_black_site(self, uri):
-        for u in self.black_site:
-            if u in uri:
-                return False
-        return True
 
     def check_url_blackext(self, uri):
         not_staticFlag = True
@@ -200,10 +205,13 @@ class CIF_Fuzz(threading.Thread):
                 request = self.queue.get()
                 uri = request['uri']
                 hash_value = self.HASH_Calc(requests_dict=request)
+                in_white_site = self.check_in_keys(uri, self.white_site)
+                in_black_site = self.check_in_keys(uri, self.black_site)
+
                 is_notstatic = self.check_url_blackext(uri)
 
                 # 判断是否已经Fuzzing过了、URL是否在测试范围内、是否在黑名单里、是否是静态文件
-                if hash_value not in self.fuzzing_finished_hash and self.check_white_site(uri) and self.check_black_site(uri) and is_notstatic:
+                if hash_value not in self.fuzzing_finished_hash and in_white_site and not in_black_site and is_notstatic:
                     self.fuzzing_finished_hash.append(hash_value)
                     method = request['method']
                     if "POST" in method:
