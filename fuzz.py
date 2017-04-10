@@ -187,7 +187,7 @@ class CIF_Fuzz(threading.Thread):
 
     def check_url_blackext(self, uri):
         not_staticFlag = True
-        url_ext = urlparse(uri).path[-4:].lower()
+        url_ext = urlparse(uri).path[-5:].lower()
 
         if ".js" in uri and ".jsp" not in url_ext:
             not_staticFlag = False
