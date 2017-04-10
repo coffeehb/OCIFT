@@ -63,27 +63,25 @@ class ProxyManage:
         logging.info('stop proxy server')
         ioloop.stop()
 
-def get_proxy(url):
-    url_parsed = urlparse(url, scheme='http')
-    proxy_key = '%s_proxy' % url_parsed.scheme
-    return os.environ.get(proxy_key)
+    def get_proxy(url):
+    	url_parsed = urlparse(url, scheme='http')
+    	proxy_key = '%s_proxy' % url_parsed.scheme
+    	return os.environ.get(proxy_key)
 
-def parse_proxy(proxy):
-    proxy_parsed = urlparse(proxy, scheme='http')
-    return proxy_parsed.hostname, proxy_parsed.port
+    def parse_proxy(proxy):
+    	proxy_parsed = urlparse(proxy, scheme='http')
+    	return proxy_parsed.hostname, proxy_parsed.port
 
-def fetch_request(url, callback, **kwargs):
-    proxy = get_proxy(url)
-    if proxy:
-        tornado.httpclient.AsyncHTTPClient.configure(
-            'tornado.curl_httpclient.CurlAsyncHTTPClient')
-        host, port = parse_proxy(proxy)
-        kwargs['proxy_host'] = host
-        kwargs['proxy_port'] = port
-
-    req = tornado.httpclient.HTTPRequest(url, **kwargs)
-    client = tornado.httpclient.AsyncHTTPClient()
-    client.fetch(req, callback, raise_error="error")
+    def fetch_request(url, callback, **kwargs):
+    	proxy = get_proxy(url)
+    	if proxy:
+           tornado.httpclient.AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient')
+           host, port = parse_proxy(proxy)
+           kwargs['proxy_host'] = host
+           kwargs['proxy_port'] = port
+        req = tornado.httpclient.HTTPRequest(url, **kwargs)
+        client = tornado.httpclient.AsyncHTTPClient()
+        client.fetch(req, callback, raise_error="error")
 
 class LoadConfig:
     def __init__(self):
