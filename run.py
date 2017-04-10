@@ -119,6 +119,7 @@ class ProxyHandler(RequestHandler):
     dnslog_sessionid = londconf.get_configprperity('dnslog_sessionid')
     commix_payload_type = londconf.get_configprperity('commix_payload_type')
     url_ext_black = londconf.get_configprperity('url_ext_black')
+    black_parameters = londconf.get_configprperity('black_parameters')
 
     Logfile = londconf.get_configprperity('Logfile')
 
@@ -153,6 +154,7 @@ class ProxyHandler(RequestHandler):
         cifz.custom_domain = custom_domain
         cifz.white_site = white_site.split(",")
         cifz.black_site = black_site.split(",")
+        cifz.black_parameters = black_parameters.split(",")
         cifz.timeout = int(timeout)
         cifz.start()
     print "[+] Everything is ready."
@@ -287,6 +289,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     print "[*] Starting HTTP proxy at: http://127.0.0.1:%d" % port
+
+    os.system('pkill -f "python run.py"')
 
     RunProxyThread(ProxyHandler, '127.0.0.1', int(port)).run()
 
