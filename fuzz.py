@@ -77,7 +77,6 @@ class CIF_Fuzz(threading.Thread):
                         pass
 
         except Exception,e:
-            print "[+] HttpHelper ERROR",e
             isOver = False
 
         return isOver
