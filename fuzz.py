@@ -210,7 +210,7 @@ class CIF_Fuzz(threading.Thread):
                 is_notstatic = self.check_url_blackext(uri)
 
                 # 判断是否已经Fuzzing过了、URL是否在测试范围内、是否在黑名单里、是否是静态文件
-                if hash_value not in self.fuzzing_finished_hash and in_white_site and not in_black_site and is_notstatic:
+                if hash_value not in self.fuzzing_finished_hash and not in_white_site and not in_black_site and is_notstatic:
                     self.fuzzing_finished_hash.append(hash_value)
                     method = request['method']
                     if "POST" in method:
